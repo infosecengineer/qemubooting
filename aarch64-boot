@@ -1,0 +1,30 @@
+#!/bin/bash
+
+## This command boots a arm image on a solid-fog pro using an ARM64 bit
+## This version requires a kernel and initram fs to be provided 
+## For console troubleshooting remove the '-daemonize' flag and execute the script
+## to use this, copy to a directory, edit the ROOTDIR variable, and chmod +x <filename-you-saved-it-as>
+
+## to get the kernel and initramfs from the image file if needed us the qemu image mounting script also found on this github
+## eithr copy -r boot from the image or copy out hte kernel and initramfs files needed to the bootdir 
+## ( or update the -initrd and -kernel to point to the location )
+## the -m <mem-in-mb> should batch the =append "mem=<set to the same number>"
+## for full descriptions visit the qemu invocationo documentation
+
+ROOTDIR=<where-to-search-for-required-files>
+IMAGEFILE=<.img-file-to-use>
+INITRAMFS=<initramfs-file>
+KERNEL=<kernel-to-use>
+ADDRESS=<address-to-listen-for-spice-connections-on>
+
+qemu-system-aarch64 --enable-kvm -M virt -cpu host -m 1024 -daemonize -smp cpus=2,cores=2,threads=1 \
+        -spice port=5900,addr=$ADDRESS,disable-ticketing=on \
+        -initrd $ROOTDIR/boot/$INITRAMFS -kernel $ROOTDIR/boot/$KERNEL \
+        -append "mem=1024 modules=sd-mod,usb-storage,ext4 root=/dev/vda3" \
+        -pflash /usr/share/AAVMF/AAVMF_CODE.fd \
+        -pflash $ROOTDIR/flash1.img \
+        -drive if=virtio,format=raw,file=$ROOTDIR/$IMAGEFILE \
+        -drive if=virtio,format=qcow2,file=$ROOTDIR/ipfire-disk1.img \
+        -net nic -net user -netdev tap,id=nd0,ifname=tap0 -device e1000,netdev=nd0 \
+        -netdev tap,id=nd1,ifname=tap1 -device e1000,netdev=nd1 \
+        -net nic -netdev tap,id=nd2,ifname=tap2 -device e1000,netdev=nd2

@@ -11,6 +11,12 @@
 ## the -m <mem-in-mb> should batch the =append "mem=<set to the same number>"
 ## for full descriptions visit the qemu invocationo documentation
 
+## flash1.img is dependent on what you are booting, this example
+## used the .fd file from /usr/share/AAVMF/AAVMF_CODE.fd
+
+## the root=/dev/vda3 will also need to be updated depending on the image file used for booting
+
+
 ROOTDIR=<where-to-search-for-required-files>
 IMAGEFILE=<.img-file-to-use>
 INITRAMFS=<initramfs-file>
@@ -22,7 +28,6 @@ qemu-system-aarch64 --enable-kvm -M virt -cpu host -m 1024 -daemonize -smp cpus=
         -spice port=5900,addr=$ADDRESS,disable-ticketing=on \
         -initrd $ROOTDIR/boot/$INITRAMFS -kernel $ROOTDIR/boot/$KERNEL \
         -append "mem=1024 modules=sd-mod,usb-storage,ext4 root=/dev/vda3" \
-        -pflash /usr/share/AAVMF/AAVMF_CODE.fd \
         -pflash $ROOTDIR/flash1.img \
         -drive if=virtio,format=raw,file=$ROOTDIR/$IMAGEFILE \
         -drive if=virtio,format=qcow2,file=$ROOTDIR/$SECONDIMAGE \

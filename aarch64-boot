@@ -16,6 +16,7 @@ IMAGEFILE=<.img-file-to-use>
 INITRAMFS=<initramfs-file>
 KERNEL=<kernel-to-use>
 ADDRESS=<address-to-listen-for-spice-connections-on>
+SECONDIMAGE=<additional-img-file-to-use>
 
 qemu-system-aarch64 --enable-kvm -M virt -cpu host -m 1024 -daemonize -smp cpus=2,cores=2,threads=1 \
         -spice port=5900,addr=$ADDRESS,disable-ticketing=on \
@@ -24,7 +25,7 @@ qemu-system-aarch64 --enable-kvm -M virt -cpu host -m 1024 -daemonize -smp cpus=
         -pflash /usr/share/AAVMF/AAVMF_CODE.fd \
         -pflash $ROOTDIR/flash1.img \
         -drive if=virtio,format=raw,file=$ROOTDIR/$IMAGEFILE \
-        -drive if=virtio,format=qcow2,file=$ROOTDIR/ipfire-disk1.img \
+        -drive if=virtio,format=qcow2,file=$ROOTDIR/$SECONDIMAGE \
         -net nic -net user -netdev tap,id=nd0,ifname=tap0 -device e1000,netdev=nd0 \
         -netdev tap,id=nd1,ifname=tap1 -device e1000,netdev=nd1 \
         -net nic -netdev tap,id=nd2,ifname=tap2 -device e1000,netdev=nd2
